@@ -33,9 +33,14 @@
   # we only do this when we have never checked out the repo before
   when: not lnbits_repo.stat.exists
 
-# TODO: set AUTH_SECRET_KEY in the .env file
+- name: Configuring LNBits to have the specified AUTH_SECRET_KEY
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/.env
+    regexp: ^AUTH_SECRET_KEY=.*
+    line: AUTH_SECRET_KEY="{{lnbits_auth_secret_key}}"
+  when: lnbits_auth_secret_key is defined
 
-- name: Configuring LNBits to listen on all network interfaces
+- name: Configuring LNBits to listen on all specified interfaces
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
     regexp: ^HOST=.*
