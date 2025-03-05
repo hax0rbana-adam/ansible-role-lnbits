@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: Adam
+  description: lnbits - free and open-source lightning network wallet/accounts system
+  license: MIT
+  company: none
+  min_ansible_version: 2.7
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+  galaxy_tags:
+    - lnbits
+    - bitcoin
+    - lightning
+    - lnd
+
+dependencies: []

@@ -1,0 +1,13 @@
+# You should set this to a strong random value. For more info, see:
+# https://github.com/lnbits/lnbits/blob/dev/.env.example
+#lnbits_auth_secret_key: 
+
+# The default expects there's an lnd user who run the LND service
+lnbits_user: lnd
+lnbits_group: lnd
+# The default binds to localhost and expects you to use nginx as a proxy
+lnbits_host: 127.0.0.1
+lnbits_backend_wallet: LndWallet
+# When using hax0rbana-adam.lnd, this is where the lnd data directory resides
+lnbits_grpc_cert: /data/lnd/tls.cert
+lnbits_grpc_macaroon: /data/lnd/data/chain/bitcoin/mainnet/admin.macaroon

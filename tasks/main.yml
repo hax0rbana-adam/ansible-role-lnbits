@@ -1,0 +1,89 @@
+# This role is expected to run as root so it can install system-wide packages
+- name: Install dependencies
+  ansible.builtin.package:
+    name:
+      - git
+      - pkg-config
+      - python3-poetry
+      - python3-fastapi
+
+- name: Checking to see if we already have a checkout of the LNBits repo
+  ansible.builtin.stat:
+    path: /usr/local/lnbits
+  register: lnbits_repo
+
+- name: Accepting different permissions on the existing LNBits checkout
+  ansible.builtin.shell:
+    cmd: git config --global --add safe.directory '/usr/local/lnbits'
+  when: lnbits_repo.stat.exists
+
+- name: Making sure we have the latest version of the LNBits code
+  ansible.builtin.git:
+    # clone the repo if it doesn't exist, otherwise update the existing repo
+    clone: "{{not lnbits_repo.stat.exists}}"
+    dest: "/usr/local/lnbits"
+    force: true
+    repo: https://github.com/lnbits/lnbits.git
+
+- name: Copying over default lnbits environment variables
+  ansible.builtin.copy:
+    src: /usr/local/lnbits/.env.example
+    dest: /usr/local/lnbits/.env
+    remote_src: true
+  # we only do this when we have never checked out the repo before
+  when: not lnbits_repo.stat.exists
+
+# TODO: set AUTH_SECRET_KEY in the .env file
+
+- name: Configuring LNBits to listen on all network interfaces
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/.env
+    regexp: ^HOST=.*
+    line: HOST={{lnbits_host}}
+
+- name: Configuring LNBits to use LND (GRPC) as a backend wallet
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/.env
+    regexp: ^LNBITS_BACKEND_WALLET_CLASS=.*
+    line: LNBITS_BACKEND_WALLET_CLASS={{lnbits_backend_wallet}}
+
+- name: Configuring LNBits to use the LND's TLS cert
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/.env
+    regexp: ^LND_GRPC_CERT=.*
+    line: LND_GRPC_CERT={{lnbits_grpc_cert}}
+
+- name: Configuring LNBits to use the LND admin macaroon
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/.env
+    regexp: ^LND_GRPC_MACAROON=.*
+    line: LND_GRPC_MACAROON={{lnbits_grpc_macaroon}}
+
+- name: Setting permissions of the lnbits code
+  ansible.builtin.file:
+    path: /usr/local/lnbits
+    recurse: true
+    mode: 'u=rwX,g=rX,o='
+    owner: '{{ lnbits_user }}'
+    group: '{{ lnbits_group }}'
+
+- name: Setting poetry to use python3
+  ansible.builtin.command: poetry env use python3
+  become: yes
+  become_user: '{{ lnbits_user }}'
+  args:
+    chdir: /usr/local/lnbits
+
+- name: Installing needed python libraries using poetry
+  ansible.builtin.command: poetry install --only main
+  become: yes
+  become_user: '{{ lnbits_user }}'
+  args:
+    chdir: /usr/local/lnbits
+
+- name: Deploying service to run LNBits
+  ansible.builtin.template:
+    src: templates/lnbits.service.j2
+    dest: /etc/systemd/system/lnbits.service
+  notify:
+    - Enable and start lnbits
