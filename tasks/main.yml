@@ -23,6 +23,7 @@
     clone: "{{not lnbits_repo.stat.exists}}"
     dest: "/usr/local/lnbits"
     force: true
+    refspec: main
     repo: https://github.com/lnbits/lnbits.git
 
 - name: Copying over default lnbits environment variables
