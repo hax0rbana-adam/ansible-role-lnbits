@@ -2,6 +2,8 @@
 Description=LNBits service
 
 [Service]
+Wants=lnd-mainnet
+After=lnd-mainnet
 ExecStart=/usr/bin/poetry run lnbits
 WorkingDirectory=/usr/local/lnbits
 User={{ lnbits_user }}
