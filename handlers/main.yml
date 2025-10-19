@@ -1,5 +1,5 @@
 - name: Enable and start lnbits
-  service:
+  ansible.builtin.service:
     name: lnbits
     enabled: true
     state: restarted

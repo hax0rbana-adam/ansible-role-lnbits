@@ -13,24 +13,38 @@
   register: lnbits_repo
 
 - name: Accepting different permissions on the existing LNBits checkout
-  ansible.builtin.shell:
+  ansible.builtin.command:
     cmd: git config --global --add safe.directory '/usr/local/lnbits'
   when: lnbits_repo.stat.exists
+  changed_when: true
+  tags:
+    - skip_ansible_lint  # we can't use the git module for this
 
 - name: Making sure we have the latest version of the LNBits code
   ansible.builtin.git:
     # clone the repo if it doesn't exist, otherwise update the existing repo
-    clone: "{{not lnbits_repo.stat.exists}}"
+    clone: "{{ not lnbits_repo.stat.exists }}"
     dest: "/usr/local/lnbits"
     force: true
-    refspec: main
+    refspec: "{{ lnbits_git_refspec }}"
+    version: "{{ lnbits_git_commit }}"
     repo: https://github.com/lnbits/lnbits.git
+
+- name: Inserting block of required poetry options
+  ansible.builtin.blockinfile:
+    insertafter: '\[tool\.poetry\]'
+    block: '{{ lnbits_poetry_config_block }}'
+    path: /usr/local/lnbits/pyproject.toml
+  when: lnbits_add_poetry_config
 
 - name: Copying over default lnbits environment variables
   ansible.builtin.copy:
     src: /usr/local/lnbits/.env.example
     dest: /usr/local/lnbits/.env
     remote_src: true
+    mode: 'u=rwX,g=rX,o='
+    owner: '{{ lnbits_user }}'
+    group: '{{ lnbits_group }}'
   # we only do this when we have never checked out the repo before
   when: not lnbits_repo.stat.exists
 
@@ -38,32 +52,32 @@
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
     regexp: ^AUTH_SECRET_KEY=.*
-    line: AUTH_SECRET_KEY="{{lnbits_auth_secret_key}}"
+    line: AUTH_SECRET_KEY="{{ lnbits_auth_secret_key }}"
   when: lnbits_auth_secret_key is defined
 
 - name: Configuring LNBits to listen on all specified interfaces
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
     regexp: ^HOST=.*
-    line: HOST={{lnbits_host}}
+    line: HOST={{ lnbits_host }}
 
 - name: Configuring LNBits to use LND (GRPC) as a backend wallet
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
     regexp: ^LNBITS_BACKEND_WALLET_CLASS=.*
-    line: LNBITS_BACKEND_WALLET_CLASS={{lnbits_backend_wallet}}
+    line: LNBITS_BACKEND_WALLET_CLASS={{ lnbits_backend_wallet }}
 
 - name: Configuring LNBits to use the LND's TLS cert
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
     regexp: ^LND_GRPC_CERT=.*
-    line: LND_GRPC_CERT={{lnbits_grpc_cert}}
+    line: LND_GRPC_CERT={{ lnbits_grpc_cert }}
 
 - name: Configuring LNBits to use the LND admin macaroon
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
     regexp: ^LND_GRPC_MACAROON=.*
-    line: LND_GRPC_MACAROON={{lnbits_grpc_macaroon}}
+    line: LND_GRPC_MACAROON={{ lnbits_grpc_macaroon }}
 
 - name: Setting permissions of the lnbits code
   ansible.builtin.file:
@@ -75,21 +89,24 @@
 
 - name: Setting poetry to use python3
   ansible.builtin.command: poetry env use python3
-  become: yes
+  become: true
   become_user: '{{ lnbits_user }}'
   args:
     chdir: /usr/local/lnbits
+  changed_when: true
 
 - name: Installing needed python libraries using poetry
   ansible.builtin.command: poetry install --only main
-  become: yes
+  become: true
   become_user: '{{ lnbits_user }}'
   args:
     chdir: /usr/local/lnbits
+  changed_when: true
 
 - name: Deploying service to run LNBits
   ansible.builtin.template:
     src: templates/lnbits.service.j2
     dest: /etc/systemd/system/lnbits.service
+    mode: '0644'
   notify:
     - Enable and start lnbits

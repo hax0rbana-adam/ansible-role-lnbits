@@ -4,7 +4,7 @@ galaxy_info:
   description: lnbits - free and open-source lightning network wallet/accounts system
   license: MIT
   company: none
-  min_ansible_version: 2.7
+  min_ansible_version: "2.7"
   platforms:
     - name: Debian
       versions:
@@ -14,5 +14,7 @@ galaxy_info:
     - bitcoin
     - lightning
     - lnd
+  role_name: lnbits
+  namespace: hax0rbana_adam
 
 dependencies: []
