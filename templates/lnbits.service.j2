@@ -1,7 +1,7 @@
 [Unit]
 Description=LNBits service
-Wants=lnd-mainnet
-After=lnd-mainnet
+Wants=lnd-mainnet.service
+After=lnd-mainnet.service
 
 [Service]
 ExecStart=/usr/bin/poetry run lnbits
