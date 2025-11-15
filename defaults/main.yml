@@ -7,11 +7,6 @@ lnbits_git_refspec: v1.3.0
 # set the commit to "HEAD" if you want rolling releases
 lnbits_git_commit: 9cc6a964334f2d4ddbb7c7da926d8f96ab50d9c7
 lnbits_add_poetry_config: true
-lnbits_poetry_config_block: |
-  name = "lnbits"
-  version = "{{ lnbits_git_refspec }}"
-  description = "lnbits"
-  authors = ["dni <office@dnilabs.com>"]
 
 # The default expects there's an lnd user who run the LND service
 lnbits_user: lnd

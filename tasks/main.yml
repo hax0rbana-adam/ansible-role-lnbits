@@ -30,13 +30,6 @@
     version: "{{ lnbits_git_commit }}"
     repo: https://github.com/lnbits/lnbits.git
 
-- name: Inserting block of required poetry options
-  ansible.builtin.blockinfile:
-    insertafter: '\[tool\.poetry\]'
-    block: '{{ lnbits_poetry_config_block }}'
-    path: /usr/local/lnbits/pyproject.toml
-  when: lnbits_add_poetry_config
-
 - name: Copying over default lnbits environment variables
   ansible.builtin.copy:
     src: /usr/local/lnbits/.env.example
