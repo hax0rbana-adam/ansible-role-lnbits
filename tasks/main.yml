@@ -67,6 +67,18 @@
     regexp: "^#? ?LNBITS_ALLOW_NEW_ACCOUNTS=.*"
     line: LNBITS_ALLOW_NEW_ACCOUNTS={{ lnbits_allow_new_accounts }}
 
+- name: Configuring whether the node management UI is displayed
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/.env
+    regexp: "^LNBITS_NODE_UI=.*"
+    line: LNBITS_NODE_UI={{ lnbits_node_ui }}
+
+- name: Configuring whether transactions are shown in the node management UI
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/.env
+    regexp: "^LNBITS_NODE_UI_TRANSACTIONS=.*"
+    line: LNBITS_NODE_UI_TRANSACTIONS={{ lnbits_node_ui_transactions }}
+
 - name: Configuring LNBits to use LND (GRPC) as a backend wallet
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
