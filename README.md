@@ -19,7 +19,7 @@ not require you have SSH running.
   connection: local
   become: true
   roles:
-    - role: hax0rbana-adam.lnbits
+    - role: hax0rbana_adam.lnbits
 ```
 
 To make a playbook to run this role on a remote host:
@@ -28,7 +28,7 @@ To make a playbook to run this role on a remote host:
 - hosts: all
   remote_user: root
   roles:
-    - role: hax0rbana-adam.lnbits
+    - role: hax0rbana_adam.lnbits
 ```
 
 # Official repo location
