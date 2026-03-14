@@ -1,5 +1,5 @@
 A simple role to install LNBits on Debian. This has only been tested with the
-LND (GRPC) backend wallet.
+LND (GRPC) and LND (REST) backend wallets.
 
 After this playbook runs, the service will be running but you'll need to create
 an administrative account. After that's done, you can install Extensions such

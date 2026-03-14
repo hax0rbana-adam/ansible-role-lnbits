@@ -67,17 +67,29 @@
     regexp: ^LNBITS_BACKEND_WALLET_CLASS=.*
     line: LNBITS_BACKEND_WALLET_CLASS={{ lnbits_backend_wallet }}
 
-- name: Configuring LNBits to use the LND's TLS cert
+- name: Configuring LNBits GRPC to use the LND's TLS cert
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
     regexp: ^LND_GRPC_CERT=.*
     line: LND_GRPC_CERT={{ lnbits_grpc_cert }}
 
-- name: Configuring LNBits to use the LND admin macaroon
+- name: Configuring LNBits GRPC to use the LND admin macaroon
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
     regexp: ^LND_GRPC_MACAROON=.*
     line: LND_GRPC_MACAROON={{ lnbits_grpc_macaroon }}
+
+- name: Configuring LNBits REST to use the LND's TLS cert
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/.env
+    regexp: ^LND_REST_CERT=.*
+    line: LND_REST_CERT={{ lnbits_rest_cert }}
+
+- name: Configuring LNBits REST to use the LND admin macaroon
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/.env
+    regexp: ^LND_REST_MACAROON=.*
+    line: LND_REST_MACAROON={{ lnbits_rest_macaroon }}
 
 - name: Setting permissions of the lnbits code
   ansible.builtin.file:

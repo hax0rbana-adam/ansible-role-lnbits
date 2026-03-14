@@ -17,3 +17,5 @@ lnbits_backend_wallet: LndWallet
 # When using hax0rbana_adam.lnd, this is where the lnd data directory resides
 lnbits_grpc_cert: /data/lnd/tls.cert
 lnbits_grpc_macaroon: /data/lnd/data/chain/bitcoin/mainnet/admin.macaroon
+lnbits_rest_cert: /data/lnd/tls.cert
+lnbits_rest_macaroon: /data/lnd/data/chain/bitcoin/mainnet/admin.macaroon
