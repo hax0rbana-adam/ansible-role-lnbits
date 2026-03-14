@@ -41,6 +41,13 @@
   # we only do this when we have never checked out the repo before
   when: not lnbits_repo.stat.exists
 
+- name: Patch source code to support Python 3.13
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/pyproject.toml
+    regexp: "^requires-python = .*"
+    line: requires-python = ">=3.10,<3.14"
+  register: patch
+
 - name: Configuring LNBits to have the specified AUTH_SECRET_KEY
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
@@ -86,6 +93,15 @@
   become_user: '{{ lnbits_user }}'
   args:
     chdir: /usr/local/lnbits
+  changed_when: true
+
+- name: Updating lock file after our patch to support Python 3.13
+  ansible.builtin.command: poetry lock
+  become: true
+  become_user: '{{ lnbits_user }}'
+  args:
+    chdir: /usr/local/lnbits
+  when: patch.changed
   changed_when: true
 
 - name: Installing needed python libraries using poetry
