@@ -61,6 +61,12 @@
     regexp: ^HOST=.*
     line: HOST={{ lnbits_host }}
 
+- name: Configuring whether new accounts should be allowed
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/.env
+    regexp: "^#? ?LNBITS_ALLOW_NEW_ACCOUNTS=.*"
+    line: LNBITS_ALLOW_NEW_ACCOUNTS={{ lnbits_allow_new_accounts }}
+
 - name: Configuring LNBits to use LND (GRPC) as a backend wallet
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
