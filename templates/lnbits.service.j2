@@ -4,7 +4,7 @@ Wants=lnd-mainnet.service
 After=lnd-mainnet.service
 
 [Service]
-ExecStart=/usr/bin/poetry run lnbits
+ExecStart=/usr/local/lnbits/bin/uv run lnbits
 WorkingDirectory=/usr/local/lnbits
 User={{ lnbits_user }}
 Group={{ lnbits_group }}

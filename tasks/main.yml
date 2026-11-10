@@ -4,21 +4,13 @@
     name:
       - git
       - pkg-config
-      - python3-poetry
+      - python3-venv
       - python3-fastapi
 
 - name: Checking to see if we already have a checkout of the LNBits repo
   ansible.builtin.stat:
     path: /usr/local/lnbits
   register: lnbits_repo
-
-- name: Accepting different permissions on the existing LNBits checkout
-  ansible.builtin.command:
-    cmd: git config --global --add safe.directory '/usr/local/lnbits'
-  when: lnbits_repo.stat.exists
-  changed_when: true
-  tags:
-    - skip_ansible_lint  # we can't use the git module for this
 
 - name: Making sure we have the latest version of the LNBits code
   ansible.builtin.git:
@@ -29,6 +21,8 @@
     refspec: "{{ lnbits_git_refspec }}"
     version: "{{ lnbits_git_commit }}"
     repo: https://github.com/lnbits/lnbits.git
+  become: true
+  become_user: '{{ lnbits_user }}'
 
 - name: Copying over default lnbits environment variables
   ansible.builtin.copy:
@@ -40,13 +34,6 @@
     group: '{{ lnbits_group }}'
   # we only do this when we have never checked out the repo before
   when: not lnbits_repo.stat.exists
-
-- name: Patch source code to support Python 3.13
-  ansible.builtin.lineinfile:
-    dest: /usr/local/lnbits/pyproject.toml
-    regexp: "^requires-python = .*"
-    line: requires-python = ">=3.10,<3.14"
-  register: patch
 
 - name: Configuring LNBits to have the specified AUTH_SECRET_KEY
   ansible.builtin.lineinfile:
@@ -117,25 +104,17 @@
     owner: '{{ lnbits_user }}'
     group: '{{ lnbits_group }}'
 
-- name: Setting poetry to use python3
-  ansible.builtin.command: poetry env use python3
+- name: Installing uv
+  ansible.builtin.pip:
+    virtualenv: /usr/local/lnbits
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+    name:
+      - uv
   become: true
   become_user: '{{ lnbits_user }}'
-  args:
-    chdir: /usr/local/lnbits
-  changed_when: true
 
-- name: Updating lock file after our patch to support Python 3.13
-  ansible.builtin.command: poetry lock
-  become: true
-  become_user: '{{ lnbits_user }}'
-  args:
-    chdir: /usr/local/lnbits
-  when: patch.changed
-  changed_when: true
-
-- name: Installing needed python libraries using poetry
-  ansible.builtin.command: poetry install --only main
+- name: Installing needed python libraries using uv
+  ansible.builtin.command: /usr/local/lnbits/bin/uv sync --all-extras
   become: true
   become_user: '{{ lnbits_user }}'
   args:
@@ -148,4 +127,4 @@
     dest: /etc/systemd/system/lnbits.service
     mode: '0644'
   notify:
-    - Enable and start lnbits
+    - Enable, daemon-reload and restart lnbits

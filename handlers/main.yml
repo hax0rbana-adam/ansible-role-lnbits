@@ -1,4 +1,4 @@
-- name: Enable and start lnbits
+- name: Enable, daemon-reload and restart lnbits
   ansible.builtin.service:
     name: lnbits
     enabled: true
