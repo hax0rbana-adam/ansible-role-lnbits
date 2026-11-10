@@ -22,3 +22,7 @@ lnbits_rest_macaroon: /data/lnd/data/chain/bitcoin/mainnet/admin.macaroon
 lnbits_allow_new_accounts: "false"
 lnbits_node_ui: "true"
 lnbits_node_ui_transactions: "true"
+# A list of public IP addresses if they can not be determined by looking at
+# the network interfaces (e.g. if you're NATed). This is used for SSRF
+# protections.
+lnbits_public_host_ips: []

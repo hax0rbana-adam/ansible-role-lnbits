@@ -54,6 +54,12 @@
     regexp: "^#? ?LNBITS_ALLOW_NEW_ACCOUNTS=.*"
     line: LNBITS_ALLOW_NEW_ACCOUNTS={{ lnbits_allow_new_accounts }}
 
+- name: Configuring LNBits so it knows about its own public IP address(es)
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lnbits/.env
+    regexp: "^LNBITS_OUTBOUND_HOST_IPS=.*"
+    line: LNBITS_OUTBOUND_HOST_IPS={{ lnbits_public_host_ips | join (',') }}
+
 - name: Configuring whether the node management UI is displayed
   ansible.builtin.lineinfile:
     dest: /usr/local/lnbits/.env
