@@ -3,9 +3,9 @@
 # lnbits_auth_secret_key:
 
 # set the refspec to "main" if you want rolling releases
-lnbits_git_refspec: v1.3.0
+lnbits_git_refspec: v1.7.0
 # set the commit to "HEAD" if you want rolling releases
-lnbits_git_commit: 9cc6a964334f2d4ddbb7c7da926d8f96ab50d9c7
+lnbits_git_commit: aaeff9a62a9310d9d14c22cc188bbd21c347577d
 lnbits_add_poetry_config: true
 
 # The default expects there's an lnd user who run the LND service
