@@ -102,14 +102,6 @@
     regexp: ^LND_REST_MACAROON=.*
     line: LND_REST_MACAROON={{ lnbits_rest_macaroon }}
 
-- name: Setting permissions of the lnbits code
-  ansible.builtin.file:
-    path: /usr/local/lnbits
-    recurse: true
-    mode: 'u=rwX,g=rX,o='
-    owner: '{{ lnbits_user }}'
-    group: '{{ lnbits_group }}'
-
 - name: Installing uv
   ansible.builtin.pip:
     virtualenv: /usr/local/lnbits
